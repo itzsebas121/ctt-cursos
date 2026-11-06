@@ -1,0 +1,7 @@
+# Monorepo root ignore
+.env
+*.log
+.DS_Store
+.vscode/
+.idea/
+
