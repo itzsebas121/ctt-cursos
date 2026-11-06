@@ -12,10 +12,10 @@ Sistema integral de CTT Cursos compuesto por:
 
 | Servicio | Contenedor | Puerto Interno | Puerto Host (Accesible) | URL Local |
 | :--- | :--- | :--- | :--- | :--- |
-| **CTT-WEB** | `ctt-frontend-web` | `80` (prod) / `5173` (dev) | `6000` *(o 5000/3000)* | [http://localhost:6000](http://localhost:6000) |
-| **CTT-ADMIN** | `ctt-frontend-admin` | `80` (prod) / `5173` (dev) | `6001` | [http://localhost:6001](http://localhost:6001) |
-| **Back-CTT** | `ctt-backend` | `8000` | `6002` | [http://localhost:6002](http://localhost:6002) (Docs: `/docs`) |
-| **PostgreSQL** | `ctt-postgres` | `5432` | `6003` | `localhost:6003` |
+| **CTT-WEB** | `ctt-frontend-web` | `80` (prod) / `5173` (dev) | `3000` | [http://localhost:3000](http://localhost:3000) |
+| **CTT-ADMIN** | `ctt-frontend-admin` | `80` (prod) / `5173` (dev) | `3001` | [http://localhost:3001](http://localhost:3001) |
+| **Back-CTT** | `ctt-backend` | `8000` | `3002` | [http://localhost:3002](http://localhost:3002) (Docs: `/docs`) |
+| **PostgreSQL** | `ctt-postgres` | `5432` | `3003` | `localhost:3003` |
 
 ---
 
@@ -40,15 +40,15 @@ docker compose up -d postgres
 # 2. Terminal Backend:
 cd Back-CTT
 source venv/bin/activate
-uvicorn src.main:app --reload --port 6002
+uvicorn src.main:app --reload --port 3002
 
 # 3. Terminal Web:
 cd CTT-WEB
-npm run dev -- --port 6000
+npm run dev -- --port 3000
 
 # 4. Terminal Admin:
 cd CTT-ADMIN
-npm run dev -- --port 6001
+npm run dev -- --port 3001
 ```
 
 ### 3. 📦 Modo Producción (Bundles optimizados con Nginx)

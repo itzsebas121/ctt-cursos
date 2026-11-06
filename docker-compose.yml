@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_EXTERNAL_PORT:-6003}:5432"
+      - "${POSTGRES_EXTERNAL_PORT:-3003}:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ctt_app} -d ${POSTGRES_DB:-ctt_db}"]
       interval: 5s
@@ -37,10 +37,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ctt_secret_password}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-clave_secreta_jwt_ctt_super_segura_2026_dev}
       DEBUG: ${DEBUG:-True}
-      BACKEND_URL: ${BACKEND_URL:-http://localhost:6002}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5000,http://localhost:6000,http://localhost:6001,http://localhost:6002,http://127.0.0.1:3000,http://127.0.0.1:5000,http://127.0.0.1:6000,http://127.0.0.1:6001,http://127.0.0.1:6002}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3002}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:3001,http://localhost:3002,http://127.0.0.1:3000,http://127.0.0.1:3001,http://127.0.0.1:3002}
     ports:
-      - "${API_PORT:-6002}:8000"
+      - "${API_PORT:-3002}:8000"
     volumes:
       - ./Back-CTT/logs:/app/logs
       - ./Back-CTT/static/images:/app/static/images
@@ -58,11 +58,11 @@ services:
       context: ./CTT-WEB
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:6002/api/v1}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3002/api/v1}
     container_name: ctt-frontend-web
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-6000}:80"
+      - "${WEB_PORT:-3000}:80"
     depends_on:
       - ctt-backend
     networks:
@@ -74,11 +74,11 @@ services:
       context: ./CTT-ADMIN
       dockerfile: Dockerfile
       args:
-        VITE_API_URL: ${VITE_API_URL:-http://localhost:6002/api/v1}
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3002/api/v1}
     container_name: ctt-frontend-admin
     restart: unless-stopped
     ports:
-      - "${ADMIN_PORT:-6001}:80"
+      - "${ADMIN_PORT:-3001}:80"
     depends_on:
       - ctt-backend
     networks:

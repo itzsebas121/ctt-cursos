@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "docker compose -f docker-compose.dev.yml up -d postgres ctt-backend && pnpm dev:fronts",
     "dev:api": "docker compose -f docker-compose.dev.yml up -d postgres ctt-backend && docker compose logs -f ctt-backend",
-    "dev:web": "pnpm --filter ctt-web exec vite --port 6000",
-    "dev:admin": "pnpm --filter ctt-admin exec vite --port 6001",
+    "dev:web": "pnpm --filter ctt-web exec vite --port 3000",
+    "dev:admin": "pnpm --filter ctt-admin exec vite --port 3001",
     "dev:fronts": "concurrently -n \"web,admin\" -c \"cyan,magenta\" \"pnpm dev:web\" \"pnpm dev:admin\"",
     "dev:db": "docker compose up -d postgres",
     "docker:prod": "docker compose up -d --build",
