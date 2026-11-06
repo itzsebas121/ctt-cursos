@@ -1,9 +1,12 @@
 [submodule "Back-CTT"]
 	path = Back-CTT
 	url = https://github.com/DannyDev18/Back-CTT.git
+	branch = main
 [submodule "CTT-ADMIN"]
 	path = CTT-ADMIN
 	url = https://github.com/itzsebas121/CTT-ADMIN.git
+	branch = main
 [submodule "CTT-WEB"]
 	path = CTT-WEB
 	url = https://github.com/itzsebas121/CTT-WEB.git
+	branch = main
