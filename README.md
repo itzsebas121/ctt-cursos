@@ -12,51 +12,57 @@ Sistema integral de CTT Cursos compuesto por:
 
 | Servicio | Contenedor | Puerto Interno | Puerto Host (Accesible) | URL Local |
 | :--- | :--- | :--- | :--- | :--- |
-| **CTT-WEB** | `ctt-frontend-web` | `80` | `6000` *(o 5000/3000)* | [http://localhost:6000](http://localhost:6000) |
-| **CTT-ADMIN** | `ctt-frontend-admin` | `80` | `6001` | [http://localhost:6001](http://localhost:6001) |
+| **CTT-WEB** | `ctt-frontend-web` | `80` (prod) / `5173` (dev) | `6000` *(o 5000/3000)* | [http://localhost:6000](http://localhost:6000) |
+| **CTT-ADMIN** | `ctt-frontend-admin` | `80` (prod) / `5173` (dev) | `6001` | [http://localhost:6001](http://localhost:6001) |
 | **Back-CTT** | `ctt-backend` | `8000` | `6002` | [http://localhost:6002](http://localhost:6002) (Docs: `/docs`) |
 | **PostgreSQL** | `ctt-postgres` | `5432` | `6003` | `localhost:6003` |
 
-> [!WARNING]
-> **Aviso sobre el puerto 6000 en navegadores:**
-> Google Chrome y Mozilla Firefox bloquean el puerto `6000` por defecto con el error `ERR_UNSAFE_PORT` (por conflicto histórico con servidores X11).
-> Si tu navegador no te permite abrir `http://localhost:6000`, puedes cambiar `WEB_PORT=5000` o `WEB_PORT=3000` en el archivo `.env` y volver a levantar.
-
 ---
 
-## ⚡ Arranque Rápido
+## 💻 Modos de Desarrollo
 
-Para levantar todo el stack en contenedores:
+### 1. 🔥 Modo Desarrollo Todo en Docker (Con Cambios en Caliente)
+*Recomendado si quieres tener **hot-reload instantáneo** tanto en React como en FastAPI sin instalar dependencias en tu máquina física.*
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+- Modifica cualquier archivo en `Back-CTT/src` y FastAPI se recarga automáticamente.
+- Modifica cualquier componente en `CTT-WEB` o `CTT-ADMIN` y Vite actualiza el navegador al instante (HMR).
+
+### 2. ⚡ Modo Híbrido (Solo Postgres en Docker + Tu código en local)
+*Para quienes prefieren correr los procesos directamente en terminales locales con sus extensiones de VS Code:*
+
+```bash
+# 1. Levantar solo la base de datos:
+docker compose up -d postgres
+
+# 2. Terminal Backend:
+cd Back-CTT
+source venv/bin/activate
+uvicorn src.main:app --reload --port 6002
+
+# 3. Terminal Web:
+cd CTT-WEB
+npm run dev -- --port 6000
+
+# 4. Terminal Admin:
+cd CTT-ADMIN
+npm run dev -- --port 6001
+```
+
+### 3. 📦 Modo Producción (Bundles optimizados con Nginx)
+*Para probar exactamente cómo correrá en despliegue final:*
 
 ```bash
 docker compose up -d --build
-```
-
-Para ver el estado de los contenedores:
-```bash
-docker compose ps
-```
-
-Para ver los logs en tiempo real:
-```bash
-docker compose logs -f
-```
-
-Para detener todos los servicios:
-```bash
-docker compose down
 ```
 
 ---
 
 ## 📁 Gestión de Repositorios (Git)
 
-Actualmente cada subcarpeta cuenta con su propio repositorio Git con sus remotos:
+Los 3 repositorios se gestionan como **Git Submodules** apuntando a sus ramas `main`:
 - `Back-CTT`: [https://github.com/DannyDev18/Back-CTT.git](https://github.com/DannyDev18/Back-CTT.git)
 - `CTT-ADMIN`: [https://github.com/itzsebas121/CTT-ADMIN.git](https://github.com/itzsebas121/CTT-ADMIN.git)
 - `CTT-WEB`: [https://github.com/itzsebas121/CTT-WEB.git](https://github.com/itzsebas121/CTT-WEB.git)
-
-La raíz actúa como **Monorepo Orquestador**:
-- Puedes inicializar un repositorio Git en la raíz (`git init`) para versionar la configuración de Docker Compose, scripts y variables de entorno (`.env.example`).
-- Puedes gestionar los 3 proyectos mediante **Git Submodules** o continuar trabajando dentro de cada carpeta (`cd Back-CTT && git pull`, `cd CTT-ADMIN && git push`, etc.) sin perder la sincronización con los repositorios originales de GitHub.
-

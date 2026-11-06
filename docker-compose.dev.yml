@@ -1,0 +1,110 @@
+# ==============================================================================
+# ENTORNO DE DESARROLLO CON HOT RELOAD (CAMBIOS EN CALIENTE)
+# Uso: docker compose -f docker-compose.dev.yml up -d --build
+# ==============================================================================
+services:
+
+  # ── Base de datos PostgreSQL ─────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: ctt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ctt_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ctt_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ctt_secret_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT:-6003}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ctt_app} -d ${POSTGRES_DB:-ctt_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - ctt-network
+
+  # ── Backend FastAPI (con --reload activo) ─────────────────────────────────────
+  ctt-backend:
+    build:
+      context: ./Back-CTT
+      dockerfile: Dockerfile
+    container_name: ctt-backend
+    restart: unless-stopped
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-ctt_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ctt_app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ctt_secret_password}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-clave_secreta_jwt_ctt_super_segura_2026_dev}
+      DEBUG: "True"
+      RELOAD: "true"
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:6002}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5000,http://localhost:6000,http://localhost:6001,http://localhost:6002,http://127.0.0.1:3000,http://127.0.0.1:5000,http://127.0.0.1:6000,http://127.0.0.1:6001,http://127.0.0.1:6002}
+    ports:
+      - "${API_PORT:-6002}:8000"
+    volumes:
+      # Montaje en caliente del código fuente
+      - ./Back-CTT/src:/app/src
+      - ./Back-CTT/alembic:/app/alembic
+      - ./Back-CTT/logs:/app/logs
+      - ./Back-CTT/static/images:/app/static/images
+      - ./Back-CTT/static/pdf:/app/static/pdf
+      - ./Back-CTT/static/svg:/app/static/svg
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - ctt-network
+
+  # ── Frontend Web (Vite Dev Server con Hot Module Replacement) ────────────────
+  ctt-web:
+    build:
+      context: ./CTT-WEB
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:6002/api/v1}
+    container_name: ctt-frontend-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-6000}:5173"
+    volumes:
+      # Montaje en caliente del código frontend
+      - ./CTT-WEB:/app
+      - /app/node_modules
+    depends_on:
+      - ctt-backend
+    networks:
+      - ctt-network
+
+  # ── Frontend Admin (Vite Dev Server con Hot Module Replacement) ───────────────
+  ctt-admin:
+    build:
+      context: ./CTT-ADMIN
+      dockerfile: Dockerfile.dev
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:6002/api/v1}
+    container_name: ctt-frontend-admin
+    restart: unless-stopped
+    ports:
+      - "${ADMIN_PORT:-6001}:5173"
+    volumes:
+      # Montaje en caliente del código admin
+      - ./CTT-ADMIN:/app
+      - /app/node_modules
+    depends_on:
+      - ctt-backend
+    networks:
+      - ctt-network
+
+# ── Recursos Compartidos ──────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  ctt-network:
+    driver: bridge
