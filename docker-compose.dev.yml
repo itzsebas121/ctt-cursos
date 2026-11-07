@@ -18,7 +18,7 @@ services:
     ports:
       - "${POSTGRES_EXTERNAL_PORT:-3003}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ctt_app} -d ${POSTGRES_DB:-ctt_db}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ctt_app} -d ${POSTGRES_DB:-ctt_db}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -108,4 +108,3 @@ volumes:
 networks:
   ctt-network:
     driver: bridge
-
