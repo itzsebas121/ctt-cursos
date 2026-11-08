@@ -42,6 +42,7 @@ services:
     ports:
       - "${API_PORT:-3002}:8000"
     volumes:
+      - ./Back-CTT/src:/app/src
       - ./Back-CTT/logs:/app/logs
       - ./Back-CTT/static/images:/app/static/images
       - ./Back-CTT/static/pdf:/app/static/pdf
